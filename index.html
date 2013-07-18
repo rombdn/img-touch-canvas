@@ -1,19 +1,93 @@
+<!DOCTYPE html>
 <html>
-<body>
-    <h1>Example Title</h1>
-    <hr>
-    <div id="console">Console</div>
-    <div id="mycontainer" style="width: 800px; height: 652px"> <!-- set desired position and size to that div -->
-        <canvas id="mycanvas" style="width: 100%; height: 100%"></canvas>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Img-touch-canvas : Light library to add touch gesture (pinch zoom) to individual images using vanilla HTML5 / JS" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Img-touch-canvas</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/rombdn/img-touch-canvas">View on GitHub</a>
+
+          <h1 id="project_title">Img-touch-canvas</h1>
+          <h2 id="project_tagline">Light library to add touch gesture (pinch zoom) to individual images using vanilla HTML5 / JS</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/rombdn/img-touch-canvas/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/rombdn/img-touch-canvas/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
     </div>
 
-    <script src="img-touch-canvas.js"></script>
-    <script>
-        var gesturableImg = new ImgTouchCanvas({
-            canvas: document.getElementById('mycanvas'),
-            path: "trollface.png",
-            desktop: true
-        });
-    </script>
-</body>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="imgtouchcanvas" class="anchor" href="#imgtouchcanvas"><span class="octicon octicon-link"></span></a>ImgTouchCanvas</h1>
+
+<p>Add touch gestures (pinch zoom and touch drag) to an image (like Google Maps).</p>
+
+<p>Based on a canvas element for smooth rendering.</p>
+
+<p>Plain HTML5 / vanilla JS, no external libraries needed.</p>
+
+<p>Tested in Chrome 28, Firefox 21, Android Browser 4.2.2 and Firefox for Android 18</p>
+
+<p><strong>Github repo : <a href="https://github.com/rombdn/img-touch-canvas/">https://github.com/rombdn/img-touch-canvas/</a></strong></p>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p><strong>See a live example here : <a href="http://www.rombdn.com/img-touch-canvas/demo">http://www.rombdn.com/img-touch-canvas/demo</a></strong></p>
+
+<p>Define a container in which the image will be able to be resized and moved, then add a canvas element.</p>
+
+<p>The image will be scaled to cover all the container so if you want the image to be showed at its original size by default 
+then set the container size to match the image original size (see example).</p>
+
+<pre><code>    &lt;html&gt;
+    &lt;body&gt;
+        &lt;div&gt; &lt;!-- set desired position and size to that div --&gt;
+            &lt;canvas id="mycanvas" style="width: 100%; height: 100%"&gt;&lt;/canvas&gt;
+        &lt;/div&gt;
+
+        &lt;script src="img-touch-canvas.js"&gt;&lt;/script&gt;
+        &lt;script&gt;
+            var gesturableImg = new ImgTouchCanvas({
+                canvas: document.getElementById('mycanvas'),
+                path: "your image url"
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
+</code></pre>
+
+<h2>
+<a name="licence" class="anchor" href="#licence"><span class="octicon octicon-link"></span></a>Licence</h2>
+
+<p>(c) 2013 Romain BEAUDON
+This code may be freely distributed under the MIT License</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Img-touch-canvas maintained by <a href="https://github.com/rombdn">rombdn</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
 </html>
