@@ -1,4 +1,4 @@
-img-touch-canvas
+ImgTouchCanvas
 ================
 
 Add touch gestures (pinch zoom and touch drag) to an image (like Google Maps).
@@ -13,7 +13,7 @@ Tested in Chrome 28, Firefox 21, Android Browser 4.2.2 and Firefox for Android 1
 Usage
 ------------
 
-See a live example here : http://rombdn.github.io/img-touch-canvas-demo
+**See a live example here : http://rombdn.github.io/img-touch-canvas-demo**
 
 Define a container in which the image will be able to be resized and moved, then add a canvas element.
 
