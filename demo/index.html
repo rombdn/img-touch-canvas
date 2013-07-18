@@ -1,0 +1,19 @@
+<html>
+<body>
+    <h1>Example Title</h1>
+    <hr>
+    <div id="console">Console</div>
+    <div id="mycontainer" style="width: 800px; height: 652px"> <!-- set desired position and size to that div -->
+        <canvas id="mycanvas" style="width: 100%; height: 100%"></canvas>
+    </div>
+
+    <script src="img-touch-canvas.js"></script>
+    <script>
+        var gesturableImg = new ImgTouchCanvas({
+            canvas: document.getElementById('mycanvas'),
+            path: "trollface.png",
+            desktop: true
+        });
+    </script>
+</body>
+</html>
