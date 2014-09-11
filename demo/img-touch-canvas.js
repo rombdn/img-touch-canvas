@@ -54,16 +54,23 @@ This code may be freely distributed under the MIT License
             //set scale such as image cover all the canvas
             if(!this.init) {
                 if(this.imgTexture.width) {
-                    var scaleRatio = null;
-                    if(this.canvas.clientWidth > this.canvas.clientHeight) {
-                        scaleRatio = this.canvas.clientWidth / this.imgTexture.width;
-                    }
-                    else {
-                        scaleRatio = this.canvas.clientHeight / this.imgTexture.height;
-                    }
-
+                    // calculate scale ratio
+                    var xRatio = (this.canvas.clientWidth / this.imgTexture.width),
+                        yRatio = (this.canvas.clientHeight / this.imgTexture.height);
+                    var scaleRatio = Math.max(xRatio, yRatio);
+                    
                     this.scale.x = scaleRatio;
                     this.scale.y = scaleRatio;
+
+                    // center and middle align image
+                    var deltaX = (this.canvas.clientWidth - (scaleRatio * this.imgTexture.width)) / 2,
+                        deltaY = (this.canvas.clientHeight - (scaleRatio * this.imgTexture.height)) / 2;
+                    
+                    this.position = {
+                        x: deltaX,
+                        y: deltaY
+                    }
+
                     this.init = true;
                 }
             }
