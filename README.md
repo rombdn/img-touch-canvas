@@ -37,6 +37,20 @@ then set the container size to match the image original size (see example).
     </html>
 
 
+Options
+------------
+When you initialize `new ImgTouchCanvas()` you can pass in the following options:
+
+```
+zoomSpeed       Speed of zoom when pinching / zooming (default 1, lower number is slower).
+initialFit      Initial display. 'fill' to fill canvas (default), 'fit' to fit image centered in canvas.
+onShow          Callback for initial display, returns image scale.
+onZoom          Callback for during zoom, returns image scale.
+maxZoom         Maximium zoom possible (default null), e.g. 2.0 for max 200%.
+```
+
+
+
 Licence
 ------------
 (c) 2013 Romain BEAUDON
