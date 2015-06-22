@@ -1,9 +1,13 @@
 /*
 =================================
-img-touch-canvas - v0.1
-http://github.com/rombdn/img-touch-canvas
+img-touch-canvas - v0.1.1
+https://github.com/tomesposito/img-touch-canvas
+(c) 2014 tomesposito
 
+forked to add zoomout from:
+http://github.com/rombdn/img-touch-canvas - v0.1
 (c) 2013 Romain BEAUDON
+
 This code may be freely distributed under the MIT License
 =================================
 */
@@ -17,13 +21,16 @@ This code may be freely distributed under the MIT License
             throw 'ImgZoom constructor: missing arguments canvas or path';
         }
 
+        //I really wanted a zoomout
+        this.zoomout = options.zoomout || false ;
+
         this.canvas         = options.canvas;
         this.canvas.width   = this.canvas.clientWidth;
         this.canvas.height  = this.canvas.clientHeight;
         this.context        = this.canvas.getContext('2d');
 
         this.desktop = options.desktop || false; //non touch events
-        
+
         this.position = {
             x: 0,
             y: 0
@@ -71,9 +78,9 @@ This code may be freely distributed under the MIT License
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
             this.context.drawImage(
-                this.imgTexture, 
-                this.position.x, this.position.y, 
-                this.scale.x * this.imgTexture.width, 
+                this.imgTexture,
+                this.position.x, this.position.y,
+                this.scale.x * this.imgTexture.width,
                 this.scale.y * this.imgTexture.height);
 
             requestAnimationFrame(this.animate.bind(this));
@@ -93,7 +100,7 @@ This code may be freely distributed under the MIT License
                 }
 
                 this.lastZoomScale = zoomScale;
-            }    
+            }
 
             return zoom;
         },
@@ -104,7 +111,7 @@ This code may be freely distributed under the MIT License
             //new scale
             var currentScale = this.scale.x;
             var newScale = this.scale.x + zoom/100;
-            
+
 
             //some helpers
             var deltaScale = newScale - currentScale;
@@ -129,15 +136,16 @@ This code may be freely distributed under the MIT License
             //edges cases
             var newWidth = currentWidth + deltaWidth;
             var newHeight = currentHeight + deltaHeight;
-            
+
             if( newWidth < this.canvas.clientWidth ) return;
             if( newPosX > 0 ) { newPosX = 0; }
             if( newPosX + newWidth < this.canvas.clientWidth ) { newPosX = this.canvas.clientWidth - newWidth;}
-            
-            if( newHeight < this.canvas.clientHeight ) return;
-            if( newPosY > 0 ) { newPosY = 0; }
-            if( newPosY + newHeight < this.canvas.clientHeight ) { newPosY = this.canvas.clientHeight - newHeight; }
 
+            if(!this.zoomout){
+              if( newHeight < this.canvas.clientHeight ) return;
+              if( newPosY > 0 ) { newPosY = 0; }
+              if( newPosY + newHeight < this.canvas.clientHeight ) { newPosY = this.canvas.clientHeight - newHeight; }
+            }
 
             //finally affectations
             this.scale.x    = newScale;
@@ -164,11 +172,13 @@ This code may be freely distributed under the MIT License
               else if( this.position.x + currentWidth < this.canvas.clientWidth ) {
                 this.position.x = this.canvas.clientWidth - currentWidth;
               }
-              if( this.position.y > 0 ) {
-                this.position.y = 0;
-              }
-              else if( this.position.y + currentHeight < this.canvas.clientHeight ) {
-                this.position.y = this.canvas.clientHeight - currentHeight;
+              if(!this.zoomout){
+                if( this.position.y > 0 ) {
+                  this.position.y = 0;
+                }
+                else if( this.position.y + currentHeight < this.canvas.clientHeight ) {
+                  this.position.y = this.canvas.clientHeight - currentHeight;
+                }
               }
             }
 
@@ -186,13 +196,13 @@ This code may be freely distributed under the MIT License
 
             this.canvas.addEventListener('touchmove', function(e) {
                 e.preventDefault();
-                
+
                 if(e.targetTouches.length == 2) { //pinch
                     this.doZoom(this.gesturePinchZoom(e));
                 }
                 else if(e.targetTouches.length == 1) {
                     var relativeX = e.targetTouches[0].pageX - this.canvas.getBoundingClientRect().left;
-                    var relativeY = e.targetTouches[0].pageY - this.canvas.getBoundingClientRect().top;                
+                    var relativeY = e.targetTouches[0].pageY - this.canvas.getBoundingClientRect().top;
                     this.doMove(relativeX, relativeY);
                 }
             }.bind(this));
@@ -238,7 +248,7 @@ This code may be freely distributed under the MIT License
             var vendors = ['ms', 'moz', 'webkit', 'o'];
             for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
                 window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-                window.cancelAnimationFrame = 
+                window.cancelAnimationFrame =
                   window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
             }
 
@@ -246,7 +256,7 @@ This code may be freely distributed under the MIT License
                 window.requestAnimationFrame = function(callback, element) {
                     var currTime = new Date().getTime();
                     var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-                    var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
+                    var id = window.setTimeout(function() { callback(currTime + timeToCall); },
                       timeToCall);
                     lastTime = currTime + timeToCall;
                     return id;

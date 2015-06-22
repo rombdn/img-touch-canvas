@@ -7,7 +7,7 @@ Based on a canvas element for smooth rendering.
 
 Plain HTML5 / vanilla JS, no external libraries needed.
 
-Tested in Chrome 28, Firefox 21, Android Browser 4.2.2 and Firefox for Android 18
+Tested in Chrome 28, Firefox 21, Android Browser 4.2.2 and Firefox for Android 18, AppleWebKit/600.1.4
 
 
 Usage
@@ -30,7 +30,8 @@ then set the container size to match the image original size (see example).
         <script>
             var gesturableImg = new ImgTouchCanvas({
                 canvas: document.getElementById('mycanvas'),
-                path: "your image url"
+                path: "your image url",
+                zoomout: true //optional to allow canvas to zoomout to device-width
             });
         </script>
     </body>
