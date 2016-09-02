@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,minimal-ui" />
+        <style>
+
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+
+            #container {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);  
+                z-index: 10;
+            }
+
+            #container canvas {
+                width: 100%;
+                height: 100%;
+            } 
+
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <script src="Zoomage.js"></script>
+        <script>
+            zoomage = new Zoomage({
+                canvas: document.getElementById('canvas'),
+                path: "./scenery_image.jpg"
+            });
+        </script>
+    </body>
+</html>

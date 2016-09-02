@@ -1,43 +1,74 @@
-ImgTouchCanvas
+Zoomage.js
 ================
+
+This library is based on "[rombdn/img-touch-canvas](https://github.com/rombdn/img-touch-canvas)", include updates and bug fix.
 
 Add touch gestures (pinch zoom and touch drag) to an image (like Google Maps).
 
 Based on a canvas element for smooth rendering.
 
-Plain HTML5 / vanilla JS, no external libraries needed.
-
-Tested in Chrome 28, Firefox 21, Android Browser 4.2.2 and Firefox for Android 18
+Plain HTML5 / Vanilla JS, no external libraries needed.
 
 
 Usage
 ------------
 
-**See a live example here : http://www.rombdn.com/img-touch-canvas/demo**
-
 Define a container in which the image will be able to be resized and moved, then add a canvas element.
 
-The image will be scaled to cover all the container so if you want the image to be showed at its original size by default 
-then set the container size to match the image original size (see example).
+A full example shows below, you can use the public api `doZoom` to zoom the image in code or manually.
 
+```html
     <html>
-    <body>
-        <div> <!-- set desired position and size to that div -->
-            <canvas id="mycanvas" style="width: 100%; height: 100%"></canvas>
-        </div>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,minimal-ui" />
+            <style>
 
-        <script src="img-touch-canvas.js"></script>
-        <script>
-            var gesturableImg = new ImgTouchCanvas({
-                canvas: document.getElementById('mycanvas'),
-                path: "your image url"
-            });
-        </script>
-    </body>
+                html, body {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                #container {
+                    position: fixed;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.8);  
+                    z-index: 10;
+                }
+
+                #container canvas {
+                    width: 100%;
+                    height: 100%;
+                } 
+
+            </style>
+        </head>
+        <body>
+            <div id="container">
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <script src="Zoomage.js"></script>
+            <script>
+
+                // Initialize "Zoomage" with a canvas and an image
+                var zoomage = new Zoomage({
+                    canvas: document.getElementById('canvas'),
+                    path: "./scenery_image.jpg"
+                });
+
+                // Increase the image size for 10 percent
+                zoomage.doZoom(10);
+
+                // Reduce the image size for 10 percent
+                zoomage.doZoom(-10);
+
+            </script>
+        </body>
     </html>
-
+```
 
 Licence
 ------------
-(c) 2013 Romain BEAUDON
+(c) 2016 YHSPY
 This code may be freely distributed under the MIT License
