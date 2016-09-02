@@ -19,7 +19,7 @@ This code may be freely distributed under the MIT License
 
     var Zoomage = function(options) {
         if( !options || !options.canvas || !options.path ) {
-            throw 'ImgZoom constructor: missing arguments canvas or path';
+            throw 'Zoomage constructor: missing arguments canvas or path';
         }
 
         this.canvas         = options.canvas;

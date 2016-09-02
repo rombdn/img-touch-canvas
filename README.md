@@ -3,6 +3,10 @@ Zoomage.js
 
 This library is based on "[rombdn/img-touch-canvas](https://github.com/rombdn/img-touch-canvas)", include updates and bug fix.
 
+
+Instruction
+------------
+
 Add touch gestures (pinch zoom and touch drag) to an image (like Google Maps).
 
 Based on a canvas element for smooth rendering.
@@ -15,12 +19,12 @@ Usage
 
 Define a container in which the image will be able to be resized and moved, then add a canvas element.
 
-A full example shows below, you can use the public api `doZoom` to zoom the image in code or manually.
+A full example shows below, you can use the public api `doZoom` to zoom the image in javascript or manually in console.
 
 ```html
     <html>
         <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,minimal-ui" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
             <style>
 
                 html, body {
