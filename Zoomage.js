@@ -26,8 +26,20 @@ This code may be freely distributed under the MIT License
         this.canvas.width   = this.canvas.clientWidth;
         this.canvas.height  = this.canvas.clientHeight;
         this.context        = this.canvas.getContext('2d');
+        // Save current context
+        this.context.save();
+
+        this.isTouching = false;
+        this.isFirstTime = true;
+        this.isImgLoaded = false;
 
         this.desktop = options.desktop || false;
+
+        this.lastTouchEndTimestamp = null;
+        this.lastTouchEndObject    = null;
+        this.dbclickZoomToggle     = true; 
+        this.dbclickZoomLength     = 0;
+        this.dbclickZoomThreshold  = options.dbclickZoomThreshold || 20;
 
         // Default settings
         this.position = {
@@ -38,6 +50,13 @@ This code may be freely distributed under the MIT License
             x: 0.5,
             y: 0.5
         };
+        this.rotate = {
+            position: {
+                x: 0,
+                y: 0
+            },
+            degree: 0
+        };
 
         this.imgTexture = new Image();
         this.imgTexture.src = options.path;
@@ -45,6 +64,8 @@ This code may be freely distributed under the MIT License
         this.lastZoomScale = null;
         this.lastX = null;
         this.lastY = null;
+
+        this.deltaRotate = null;
 
         this.mdown = false; 
 
@@ -87,17 +108,25 @@ This code may be freely distributed under the MIT License
                 }
             }
 
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            if(this.isTouching){
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            } else {
+                this.context.restore();
+                this.context.save();
+            }
 
-            this.context.drawImage(
-                this.imgTexture, 
-                this.position.x, this.position.y, 
-                this.scale.x * this.imgTexture.width, 
-                this.scale.y * this.imgTexture.height);
+            if((this.isTouching || this.isFirstTime) && this.isImgLoaded) {
+                this.context.drawImage(
+                    this.imgTexture, 
+                    this.position.x, this.position.y, 
+                    this.scale.x * this.imgTexture.width, 
+                    this.scale.y * this.imgTexture.height);
+            }
+
+            this.isFirstTime = false;
 
             requestAnimationFrame(this.animate.bind(this));
         },
-
 
         gesturePinchZoom: function(event) {
             var zoom = false;
@@ -117,6 +146,19 @@ This code may be freely distributed under the MIT License
             return zoom;
         },
 
+        gestureRotate: function(event) {
+            var rotate = false;
+
+            if( event.targetTouches.length >= 2 ) {
+                var p1 = event.targetTouches[0];
+                var p2 = event.targetTouches[1];
+
+                // TODO
+            }    
+
+            return rotate;
+        },
+
         doZoom: function(zoom) {
             if(!zoom) return;
 
@@ -132,9 +174,9 @@ This code may be freely distributed under the MIT License
             var newPosY        = this.position.y - deltaHeight / 2;
 
             // Restriction
-            if(newScale * this.imgTexture.width > 2 * this.canvas.width || newScale * this.imgTexture.height > 2 * this.canvas.height ||
-                newScale * this.imgTexture.width < 0.3 * this.canvas.width || newScale * this.imgTexture.height < 0.3 * this.canvas.height) {
-                return;
+            if(newScale * this.imgTexture.width > 2.2 * this.canvas.width || newScale * this.imgTexture.height > 2.2 * this.canvas.height ||
+                newScale * this.imgTexture.width < 0.2 * this.canvas.width || newScale * this.imgTexture.height < 0.2 * this.canvas.height) {
+                return false;
             }
 
             // Adjust scale and position
@@ -142,6 +184,10 @@ This code may be freely distributed under the MIT License
             this.scale.y    = newScale;
             this.position.x = newPosX;
             this.position.y = newPosY;
+
+            this.isTouching = true;
+
+            return true;
         },
 
         doMove: function(relativeX, relativeY) {
@@ -159,12 +205,96 @@ This code may be freely distributed under the MIT License
             this.lastY = relativeY;
         },
 
+        doRotate: function(rotate) {
+            // TODO
+        },  
+
+        zoomInAnim: function() {
+
+            var animTag = null;
+
+            if(this.dbclickZoomLength > 0) {
+                var r = this.doZoom(2);
+                if(!r) {
+                    return false;
+                    cancelAnimationFrame(animTag);
+                }
+                this.dbclickZoomLength = this.dbclickZoomLength - 2;
+                animTag = requestAnimationFrame(this.zoomInAnim.bind(this));
+            } else {
+                cancelAnimationFrame(animTag);
+            }
+
+            return true;
+        },
+
+        zoomOutAnim: function() {
+
+            var animTag = null;
+
+            if(this.dbclickZoomLength > 0) {
+                var r = this.doZoom(-2);
+                if(!r) {
+                    return false;
+                    cancelAnimationFrame(animTag);
+                }
+                this.dbclickZoomLength = this.dbclickZoomLength - 2;
+                animTag = requestAnimationFrame(this.zoomOutAnim.bind(this));
+            } else {
+                cancelAnimationFrame(animTag);
+            }
+
+            return true;
+        },
+
         setEventListeners: function() {
-   
+            // "bind()" is not supported in IE6/7/8
+            this.canvas.addEventListener('touchend', function(e) {
+
+                this.isTouching = false;
+
+                if(this.lastTouchEndTimestamp === null || this.lastTouchEndObject === null) {
+                    this.lastTouchEndTimestamp = Math.round(new Date().getTime());
+                    this.lastTouchEndObject = e.changedTouches[0];
+                } else {
+                    var currentTimestamp = Math.round(new Date().getTime());
+                    if(currentTimestamp - this.lastTouchEndTimestamp < 300) {
+
+                        if(Math.abs(this.lastTouchEndObject.pageX - e.changedTouches[0].pageX) < 20 &&
+                            Math.abs(this.lastTouchEndObject.pageY - e.changedTouches[0].pageY < 20)) {
+                            // Zoom!
+                            this.dbclickZoomLength = this.dbclickZoomThreshold;
+
+                            if(this.dbclickZoomToggle){
+                                var r = this.zoomInAnim();
+                                if(!r) {
+                                    this.zoomOutAnim();
+                                }
+                            } else {
+                                var r = this.zoomOutAnim();
+                                if(!r) {
+                                    this.zoomInAnim();
+                                }
+                            }
+
+                            this.dbclickZoomToggle = !this.dbclickZoomToggle;
+                        }
+                    }
+
+                    this.lastTouchEndTimestamp = currentTimestamp;
+                    this.lastTouchEndObject = e.changedTouches[0];
+                }
+
+            }.bind(this));
+
             this.canvas.addEventListener('touchstart', function(e) {
+
+                this.isTouching = true;
+
                 this.lastX          = null;
                 this.lastY          = null;
                 this.lastZoomScale  = null;
+
             }.bind(this));
 
             this.canvas.addEventListener('touchmove', function(e) {
@@ -172,12 +302,16 @@ This code may be freely distributed under the MIT License
                 
                 if(e.targetTouches.length == 2) { 
                     this.doZoom(this.gesturePinchZoom(e));
-                }
-                else if(e.targetTouches.length == 1) {
+                } else if(e.targetTouches.length == 1) {
                     var relativeX = e.targetTouches[0].pageX - this.canvas.getBoundingClientRect().left;
                     var relativeY = e.targetTouches[0].pageY - this.canvas.getBoundingClientRect().top;                
                     this.doMove(relativeX, relativeY);
                 }
+            }.bind(this));
+
+            this.imgTexture.addEventListener('load', function(e){
+                this.isImgLoaded = true;
+                this.isFirstTime = true;
             }.bind(this));
 
             if(this.desktop) {
