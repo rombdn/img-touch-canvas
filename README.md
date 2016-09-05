@@ -4,6 +4,11 @@ Zoomage.js
 This library is based on "[rombdn/img-touch-canvas](https://github.com/rombdn/img-touch-canvas)", include updates and bug fix.
 
 
+Preview
+------------
+
+
+
 Instruction
 ------------
 
