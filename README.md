@@ -7,7 +7,9 @@ This library is based on "[rombdn/img-touch-canvas](https://github.com/rombdn/im
 Preview
 ------------
 
-
+![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-dbclick.gif?raw=true)
+![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-zoom.gif?raw=true)
+![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-drag.gif?raw=true)
 
 Instruction
 ------------
