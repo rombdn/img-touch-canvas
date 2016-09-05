@@ -57,8 +57,14 @@ A full example shows below, you can use the public api `doZoom` to zoom the imag
 
                 // Initialize "Zoomage" with a canvas and an image
                 var zoomage = new Zoomage({
+
                     canvas: document.getElementById('canvas'),
-                    path: "./scenery_image.jpg"
+                    path: "./scenery_image.jpg",
+
+                    // Advanced Settings:
+                    // [dbclickZoomThreshold] Set auto zoom threshold when double click on the image
+                    dbclickZoomThreshold: 10
+                    
                 });
 
                 // Increase the image size for 10 percent
