@@ -7,8 +7,13 @@ This library is based on "[rombdn/img-touch-canvas](https://github.com/rombdn/im
 Preview
 ------------
 
+##### Double click on the screen will auto-zoomin/out the image.
 ![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-dbclick.gif?raw=true)
+
+##### Zoomin/out the image with two finger gesture.
 ![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-zoom.gif?raw=true)
+
+##### Drag the image with one finger touch.
 ![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-drag.gif?raw=true)
 
 Instruction
