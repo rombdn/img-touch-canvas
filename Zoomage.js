@@ -26,12 +26,17 @@ This code may be freely distributed under the MIT License
         this.canvas.width   = this.canvas.clientWidth;
         this.canvas.height  = this.canvas.clientHeight;
         this.context        = this.canvas.getContext('2d');
+
+        // Get callback method
+        this.onZoom         = options.onZoom || null;
+        this.onZoomEnd      = options.onZoomEnd || null;
+
         // Save current context
         this.context.save();
 
-        this.isTouching = false;
-        this.isFirstTime = true;
-        this.isImgLoaded = false;
+        this.isTouching     = false;
+        this.isFirstTime    = true;
+        this.isImgLoaded    = false;
 
         this.desktop = options.desktop || false;
 
@@ -39,7 +44,7 @@ This code may be freely distributed under the MIT License
         this.lastTouchEndObject    = null;
         this.dbclickZoomToggle     = true; 
         this.dbclickZoomLength     = 0;
-        this.dbclickZoomThreshold  = options.dbclickZoomThreshold || 20;
+        this.dbclickZoomThreshold  = Math.abs(options.dbclickZoomThreshold) || 0.1;
 
         // Default settings
         this.position = {
@@ -70,15 +75,15 @@ This code may be freely distributed under the MIT License
         this.mdown = false; 
 
         this.init = false;
-        this.checkRequestAnimationFrame();
-        requestAnimationFrame(this.animate.bind(this));
+        this._checkRequestAnimationFrame();
+        requestAnimationFrame(this._animate.bind(this));
 
-        this.setEventListeners();
+        this._setEventListeners();
     };
 
     // Set initialized canvas scale
     Zoomage.prototype = {
-        animate: function() {
+        _animate: function() {
 
             if(!this.init) {
                 if(this.imgTexture.width && this.imgTexture.height) {
@@ -125,10 +130,10 @@ This code may be freely distributed under the MIT License
 
             this.isFirstTime = false;
 
-            requestAnimationFrame(this.animate.bind(this));
+            requestAnimationFrame(this._animate.bind(this));
         },
 
-        gesturePinchZoom: function(event) {
+        _gesturePinchZoom: function(event) {
             var zoom = false;
 
             if( event.targetTouches.length >= 2 ) {
@@ -146,7 +151,7 @@ This code may be freely distributed under the MIT License
             return zoom;
         },
 
-        gestureRotate: function(event) {
+        _gestureRotate: function(event) {
             var rotate = false;
 
             if( event.targetTouches.length >= 2 ) {
@@ -159,7 +164,7 @@ This code may be freely distributed under the MIT License
             return rotate;
         },
 
-        doZoom: function(zoom) {
+        _doZoom: function(zoom) {
             if(!zoom) return;
 
             // Get new scale
@@ -187,10 +192,21 @@ This code may be freely distributed under the MIT License
 
             this.isTouching = true;
 
+            if(this._type(this.onZoom) === "function") {
+                this.onZoom.call(this, 
+                    {
+                        zoomScale: newScale, 
+                        imageScale: {
+                            width: newScale * this.imgTexture.width ,
+                            height: newScale * this.imgTexture.height
+                        }
+                    });
+            }
+
             return true;
         },
 
-        doMove: function(relativeX, relativeY) {
+        _doMove: function(relativeX, relativeY) {
             if(this.lastX && this.lastY) {
               var deltaX = relativeX - this.lastX;
               var deltaY = relativeY - this.lastY;
@@ -205,22 +221,22 @@ This code may be freely distributed under the MIT License
             this.lastY = relativeY;
         },
 
-        doRotate: function(rotate) {
+        _doRotate: function(rotate) {
             // TODO
         },  
 
-        zoomInAnim: function() {
+        _zoomInAnim: function() {
 
             var animTag = null;
+            var zoomThreshold = Math.round(this.dbclickZoomLength / 10 * 2);
 
             if(this.dbclickZoomLength > 0) {
-                var r = this.doZoom(2);
-                if(!r) {
+                if(!this._doZoom(zoomThreshold)) {
                     return false;
                     cancelAnimationFrame(animTag);
                 }
-                this.dbclickZoomLength = this.dbclickZoomLength - 2;
-                animTag = requestAnimationFrame(this.zoomInAnim.bind(this));
+                this.dbclickZoomLength = this.dbclickZoomLength - zoomThreshold;
+                animTag = requestAnimationFrame(this._zoomInAnim.bind(this));
             } else {
                 cancelAnimationFrame(animTag);
             }
@@ -228,18 +244,18 @@ This code may be freely distributed under the MIT License
             return true;
         },
 
-        zoomOutAnim: function() {
+        _zoomOutAnim: function() {
 
             var animTag = null;
-
+            var zoomThreshold = Math.round(this.dbclickZoomLength / 10 * 2);
+            
             if(this.dbclickZoomLength > 0) {
-                var r = this.doZoom(-2);
-                if(!r) {
+                if(!this._doZoom(-zoomThreshold)) {
                     return false;
                     cancelAnimationFrame(animTag);
                 }
-                this.dbclickZoomLength = this.dbclickZoomLength - 2;
-                animTag = requestAnimationFrame(this.zoomOutAnim.bind(this));
+                this.dbclickZoomLength = this.dbclickZoomLength - zoomThreshold;
+                animTag = requestAnimationFrame(this._zoomOutAnim.bind(this));
             } else {
                 cancelAnimationFrame(animTag);
             }
@@ -247,7 +263,7 @@ This code may be freely distributed under the MIT License
             return true;
         },
 
-        setEventListeners: function() {
+        _setEventListeners: function() {
             // "bind()" is not supported in IE6/7/8
             this.canvas.addEventListener('touchend', function(e) {
 
@@ -263,17 +279,15 @@ This code may be freely distributed under the MIT License
                         if(Math.abs(this.lastTouchEndObject.pageX - e.changedTouches[0].pageX) < 20 &&
                             Math.abs(this.lastTouchEndObject.pageY - e.changedTouches[0].pageY < 20)) {
                             // Zoom!
-                            this.dbclickZoomLength = this.dbclickZoomThreshold;
+                            this.dbclickZoomLength = 100 * this.dbclickZoomThreshold;
 
                             if(this.dbclickZoomToggle){
-                                var r = this.zoomInAnim();
-                                if(!r) {
-                                    this.zoomOutAnim();
+                                if(!this._zoomInAnim()) {
+                                    this._zoomOutAnim();
                                 }
                             } else {
-                                var r = this.zoomOutAnim();
-                                if(!r) {
-                                    this.zoomInAnim();
+                                if(!this._zoomOutAnim()) {
+                                    this._zoomInAnim();
                                 }
                             }
 
@@ -301,11 +315,15 @@ This code may be freely distributed under the MIT License
                 e.preventDefault();
                 
                 if(e.targetTouches.length == 2) { 
-                    this.doZoom(this.gesturePinchZoom(e));
+
+                    this._doZoom(this._gesturePinchZoom(e));
+
                 } else if(e.targetTouches.length == 1) {
+
                     var relativeX = e.targetTouches[0].pageX - this.canvas.getBoundingClientRect().left;
                     var relativeY = e.targetTouches[0].pageY - this.canvas.getBoundingClientRect().top;                
-                    this.doMove(relativeX, relativeY);
+                    this._doMove(relativeX, relativeY);
+                    
                 }
             }.bind(this));
 
@@ -318,10 +336,10 @@ This code may be freely distributed under the MIT License
 
                 window.addEventListener('keyup', function(e) {
                     if(e.keyCode == 187 || e.keyCode == 61) { 
-                        this.doZoom(5);
+                        this._doZoom(5);
                     }
                     else if(e.keyCode == 54) {
-                        this.doZoom(-5);
+                        this._doZoom(-5);
                     }
                 }.bind(this));
 
@@ -340,7 +358,7 @@ This code may be freely distributed under the MIT License
                     var relativeY = e.pageY - this.canvas.getBoundingClientRect().top;
 
                     if(e.target == this.canvas && this.mdown) {
-                        this.doMove(relativeX, relativeY);
+                        this._doMove(relativeX, relativeY);
                     }
 
                     if(relativeX <= 0 || relativeX >= this.canvas.clientWidth || relativeY <= 0 || relativeY >= this.canvas.clientHeight) {
@@ -350,7 +368,24 @@ This code may be freely distributed under the MIT License
             }
         },
 
-        checkRequestAnimationFrame: function() {
+        _type: function(obj) {
+
+            var class2type = {},
+                toString = class2type.toString;
+
+            class2type["[object Function]"] = "function";
+
+            if (obj == null) {
+                return obj + "";
+            }
+
+            // Support: Android<4.0, iOS<6 (functionish RegExp)
+            return typeof obj === "object" || typeof obj === "function" ?
+                class2type[ toString.call( obj ) ] || "object" :
+                typeof obj;
+        },
+
+        _checkRequestAnimationFrame: function() {
             var lastTime = 0;
             var vendors = ['ms', 'moz', 'webkit', 'o'];
             for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
@@ -375,8 +410,19 @@ This code may be freely distributed under the MIT License
                     clearTimeout(id);
                 };
             }
+        },
+
+        // Public function
+        zoom: function(zoom) {
+
+            this.dbclickZoomLength = Math.abs(100 * zoom);
+
+            (zoom > 0 ? this._zoomInAnim() : this._zoomOutAnim());
+
         }
+
     };
 
     root.Zoomage = Zoomage;
+
 }).call(this);

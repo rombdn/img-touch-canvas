@@ -70,20 +70,28 @@ A full example shows below, you can use the public api `doZoom` to zoom the imag
                 // Initialize "Zoomage" with a canvas and an image
                 var zoomage = new Zoomage({
 
+                    // Basic Settings:
+                    // [canvas: DOM] A canvas dom element for displaying
                     canvas: document.getElementById('canvas'),
+
+                    // [path: String] An image's path which you want to be zoomed
                     path: "./scenery_image.jpg",
 
                     // Advanced Settings:
-                    // [dbclickZoomThreshold] Set auto zoom threshold when double click on the image
-                    dbclickZoomThreshold: 10
-                    
+                    // [dbclickZoomThreshold: Number] Set auto zoom threshold when double click on the image (value 0.1 means the zoom step length is 10% of image's current scale)
+                    dbclickZoomThreshold: 0.1，
+
+                    // [onZoom: Function] Callback function called when image is zooming
+                    onZoom: function(data) { 
+                        console.log("[Zoom Scale] " + data.zoomScale, "\n[Image Width] " + data.imageScale.width, "\n[Image Height] " + data.imageScale.height);
+                    }
                 });
 
                 // Increase the image size for 10 percent
-                zoomage.doZoom(10);
+                zoomage.zoom(0.1);
 
                 // Reduce the image size for 10 percent
-                zoomage.doZoom(-10);
+                zoomage.zoom(-0.1);
 
             </script>
         </body>
