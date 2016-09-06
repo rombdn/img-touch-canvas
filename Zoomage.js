@@ -14,8 +14,20 @@ This code may be freely distributed under the MIT License
 =================================
 */
 
-(function() {
-    var root = this; 
+(function(root, factory) {
+
+    if(typeof module === "object" && module.exports) {
+
+        module.exports = factory（）;
+
+    } else {
+
+        root.Zoomage = factory();
+        
+    }
+
+}(this, function() {
+
 
     var Zoomage = function(options) {
         if( !options || !options.canvas || !options.path ) {
@@ -248,7 +260,7 @@ This code may be freely distributed under the MIT License
 
             var animTag = null;
             var zoomThreshold = Math.round(this.dbclickZoomLength / 10 * 2);
-            
+
             if(this.dbclickZoomLength > 0) {
                 if(!this._doZoom(-zoomThreshold)) {
                     return false;
@@ -423,6 +435,6 @@ This code may be freely distributed under the MIT License
 
     };
 
-    root.Zoomage = Zoomage;
+    return Zoomage;
 
-}).call(this);
+}));
