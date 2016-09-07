@@ -8,13 +8,13 @@ Preview
 ------------
 
 ##### Double click on the screen will auto-zoomin/out the image.
-![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-dbclick.gif?raw=true)
+![image](https://github.com/Becavalier/Zoomage.js/blob/master/images/preview-dbclick.gif?raw=true)
 
 ##### Zoomin/out the image with two finger gesture.
-![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-zoom.gif?raw=true)
+![image](https://github.com/Becavalier/Zoomage.js/blob/master/images/preview-zoom.gif?raw=true)
 
 ##### Drag the image with one finger touch.
-![image](https://github.com/Becavalier/Zoomage.js/blob/master/preview/preview-drag.gif?raw=true)
+![image](https://github.com/Becavalier/Zoomage.js/blob/master/images/preview-drag.gif?raw=true)
 
 Instruction
 ------------
@@ -75,7 +75,7 @@ A full example shows below, you can use the public api `doZoom` to zoom the imag
                     canvas: document.getElementById('canvas'),
 
                     // [path: String] An image's path which you want to be zoomed
-                    path: "./scenery_image.jpg",
+                    path: "./images/scenery_image.jpg",
 
                     // Advanced Settings:
                     // [dbclickZoomThreshold: Number] Set auto zoom threshold when double click on the image (value 0.1 means the zoom step length is 10% of image's current scale)
