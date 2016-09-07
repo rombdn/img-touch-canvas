@@ -18,7 +18,7 @@ This code may be freely distributed under the MIT License
 
     if(typeof module === "object" && module.exports) {
 
-        module.exports = factory（）;
+        module.exports = factory();
 
     } else {
 
