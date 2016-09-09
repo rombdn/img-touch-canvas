@@ -171,6 +171,27 @@ This code may be freely distributed under the MIT License
                 var p2 = event.targetTouches[1];
 
                 // TODO
+                var rotatePoint = p1,
+                    rotateAngel = 0;
+
+                if(rotatePoint.pageY == p2.pageY && rotatePoint.pageX < p2.pageX) {
+                    rotateAngel = 0;
+                } else if(rotatePoint.pageY < p2.pageY && rotatePoint.pageX < p2.pageX) {
+                    rotateAngel = Math.atan((p2.pageY - rotatePoint.pageY) / (p1.pageX - rotatePoint.pageX)) * 180 / Math.PI;
+                } else if(rotatePoint.pageY < p2.pageY && rotatePoint.pageX == p2.pageX) {
+                    rotatePoint = 90;
+                } else if(rotatePoint.pageY < p2.pageY && rotatePoint.pageX > p2.pageX) {
+                    rotateAngel = 180 - Math.atan((p2.pageY - rotatePoint.pageY) / (rotatePoint.pageX - p2.pageX)) * 180 / Math.PI;
+                } else if(rotatePoint.pageY == p2.pageY && rotatePoint.pageX < p2.pageX) {
+                    rotateAngel = 180;
+                } else if(rotatePoint.pageY > p2.pageY && rotatePoint.pageX < p2.page) {
+                    rotateAngel = 180 + Math.atan((p2.pageY - rotatePoint.pageY) / (rotatePoint.pageX - p2.pageX)) * 180 / Math.PI;
+                } else if(rotatePoint.pageY > p2.pageY && rotatePoint.pageX == p2.page) {
+                    rotateAngel = 270;
+                } else if(rotatePoint.pageY > p2.pageY && rotatePoint.pageX < p2.page) {
+                    rotateAngel = 360 - Math.atan((rotatePoint.pageY - p2.pageY) / (p2.pageX - rotatePoint.pageX)) * 180 / Math.PI;
+                }
+
             }    
 
             return rotate;
