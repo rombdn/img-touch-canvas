@@ -30,10 +30,12 @@
 
         <script src="./Zoomage.js"></script>
         <script>
-            zoomage = new Zoomage({
+            var zoomage = new Zoomage({
                 canvas: document.getElementById('canvas'),
                 path: "./images/scenery_image.jpg",
                 dbclickZoomThreshold: 0.1,
+                // gestureRotate: true,
+                desktop: true,
                 onZoom: function(data) {
                     console.log("[Zoom Scale] " + data.zoomScale, "\n[Image Width] " + data.imageScale.width, "\n[Image Height] " + data.imageScale.height);
                 }

@@ -43,11 +43,15 @@ This code may be freely distributed under the MIT License
         this.onZoom         = options.onZoom || null;
         this.onZoomEnd      = options.onZoomEnd || null;
 
+        // Whether turn on the switch of gesture rotate
+        this.gestureRotate  = options.gestureRotate || false;
+        this.rotateThreshold = 5;
+
         // Save current context
         this.context.save();
 
-        this.isTouching     = false;
-        this.isFirstTime    = true;
+        this.isOnTouching     = false;
+        this.isFirstTimeLoad    = true;
         this.isImgLoaded    = false;
 
         this.desktop = options.desktop || false;
@@ -68,17 +72,15 @@ This code may be freely distributed under the MIT License
             y: 0.5
         };
         this.rotate = {
-            position: {
-                x: 0,
-                y: 0
-            },
-            degree: 0
+            center: {},
+            angle: 0
         };
 
         this.imgTexture = new Image();
         this.imgTexture.src = options.path;
 
         this.lastZoomScale = null;
+        this.lastTouchRotateAngle = null;
         this.lastX = null;
         this.lastY = null;
 
@@ -87,6 +89,7 @@ This code may be freely distributed under the MIT License
         this.mdown = false; 
 
         this.init = false;
+
         this._checkRequestAnimationFrame();
         requestAnimationFrame(this._animate.bind(this));
 
@@ -95,6 +98,7 @@ This code may be freely distributed under the MIT License
 
     // Set initialized canvas scale
     Zoomage.prototype = {
+
         _animate: function() {
 
             if(!this.init) {
@@ -125,14 +129,23 @@ This code may be freely distributed under the MIT License
                 }
             }
 
-            if(this.isTouching){
+            if(this.isOnTouching || this.mdown){
                 this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             } else {
-                this.context.restore();
-                this.context.save();
+                if(!this.gestureRotate) {
+                    this.context.restore();
+                    this.context.save();
+                }
             }
 
-            if((this.isTouching || this.isFirstTime) && this.isImgLoaded) {
+            if(this.gestureRotate) {
+                this.context.translate(this.rotate.center.pageX, this.rotate.center.pageY);
+                this.context.rotate(this.rotate.angle);
+                this.context.translate(-this.rotate.center.pageX, -this.rotate.center.pageY);
+                this.rotate.angle = 0;
+            }
+            
+            if((this.isOnTouching || this.isFirstTimeLoad || this.mdown) && this.isImgLoaded) {
                 this.context.drawImage(
                     this.imgTexture, 
                     this.position.x, this.position.y, 
@@ -140,7 +153,7 @@ This code may be freely distributed under the MIT License
                     this.scale.y * this.imgTexture.height);
             }
 
-            this.isFirstTime = false;
+            this.isFirstTimeLoad = false;
 
             requestAnimationFrame(this._animate.bind(this));
         },
@@ -171,28 +184,32 @@ This code may be freely distributed under the MIT License
                 var p2 = event.targetTouches[1];
 
                 // TODO
-                var rotatePoint = p1,
-                    rotateAngel = 0;
+                var rotateAngel = 0;
 
-                if(rotatePoint.pageY == p2.pageY && rotatePoint.pageX < p2.pageX) {
+                if(p1.pageY == p2.pageY && p1.pageX < p2.pageX) {
                     rotateAngel = 0;
-                } else if(rotatePoint.pageY < p2.pageY && rotatePoint.pageX < p2.pageX) {
-                    rotateAngel = Math.atan((p2.pageY - rotatePoint.pageY) / (p1.pageX - rotatePoint.pageX)) * 180 / Math.PI;
-                } else if(rotatePoint.pageY < p2.pageY && rotatePoint.pageX == p2.pageX) {
-                    rotatePoint = 90;
-                } else if(rotatePoint.pageY < p2.pageY && rotatePoint.pageX > p2.pageX) {
-                    rotateAngel = 180 - Math.atan((p2.pageY - rotatePoint.pageY) / (rotatePoint.pageX - p2.pageX)) * 180 / Math.PI;
-                } else if(rotatePoint.pageY == p2.pageY && rotatePoint.pageX < p2.pageX) {
+                } else if(p1.pageY < p2.pageY && p1.pageX < p2.pageX) {
+                    rotateAngel = Math.atan((p2.pageY - p1.pageY) / (p2.pageX - p1.pageX)) * 180 / Math.PI;
+                } else if(p1.pageY < p2.pageY && p1.pageX == p2.pageX) {
+                    rotateAngel = 90;
+                } else if(p1.pageY < p2.pageY && p1.pageX > p2.pageX) {
+                    rotateAngel = 180 - Math.atan((p2.pageY - p1.pageY) / (p1.pageX - p2.pageX)) * 180 / Math.PI;
+                } else if(p1.pageY == p2.pageY && p1.pageX > p2.pageX) {
                     rotateAngel = 180;
-                } else if(rotatePoint.pageY > p2.pageY && rotatePoint.pageX < p2.page) {
-                    rotateAngel = 180 + Math.atan((p2.pageY - rotatePoint.pageY) / (rotatePoint.pageX - p2.pageX)) * 180 / Math.PI;
-                } else if(rotatePoint.pageY > p2.pageY && rotatePoint.pageX == p2.page) {
+                } else if(p1.pageY > p2.pageY && p1.pageX > p2.pageX) {
+                    rotateAngel = 180 - Math.atan((p2.pageY - p1.pageY) / (p1.pageX - p2.pageX)) * 180 / Math.PI;
+                } else if(p1.pageY > p2.pageY && p1.pageX == p2.pageX) {
                     rotateAngel = 270;
-                } else if(rotatePoint.pageY > p2.pageY && rotatePoint.pageX < p2.page) {
-                    rotateAngel = 360 - Math.atan((rotatePoint.pageY - p2.pageY) / (p2.pageX - rotatePoint.pageX)) * 180 / Math.PI;
+                } else if(p1.pageY > p2.pageY && p1.pageX < p2.pageX) {
+                    rotateAngel = 360 - Math.atan((p1.pageY - p2.pageY) / (p2.pageX - p1.pageX)) * 180 / Math.PI;
                 }
 
             }    
+
+            rotate = {
+                o: p1,
+                a: rotateAngel
+            };
 
             return rotate;
         },
@@ -223,7 +240,7 @@ This code may be freely distributed under the MIT License
             this.position.x = newPosX;
             this.position.y = newPosY;
 
-            this.isTouching = true;
+            this.isOnTouching = true;
 
             if(this._type(this.onZoom) === "function") {
                 this.onZoom.call(this, 
@@ -241,6 +258,7 @@ This code may be freely distributed under the MIT License
 
         _doMove: function(relativeX, relativeY) {
             if(this.lastX && this.lastY) {
+
               var deltaX = relativeX - this.lastX;
               var deltaY = relativeY - this.lastY;
               var currentWidth = (this.imgTexture.width * this.scale.x);
@@ -248,14 +266,23 @@ This code may be freely distributed under the MIT License
 
               this.position.x += deltaX;
               this.position.y += deltaY;
+
             }
 
             this.lastX = relativeX;
             this.lastY = relativeY;
         },
 
-        _doRotate: function(rotate) {
-            // TODO
+        _doRotate: function(rotateArr) {
+
+            if(this.lastTouchRotateAngle !== null) {
+                this.rotate = {
+                    angle: (rotateArr.a - this.lastTouchRotateAngle) * Math.PI / 180 * this.rotateThreshold,
+                    center: rotateArr.o
+                }
+            }
+
+            this.lastTouchRotateAngle = rotateArr.a;
         },  
 
         _zoomInAnim: function() {
@@ -300,43 +327,47 @@ This code may be freely distributed under the MIT License
             // "bind()" is not supported in IE6/7/8
             this.canvas.addEventListener('touchend', function(e) {
 
-                this.isTouching = false;
+                this.isOnTouching = false;
+                this.lastTouchRotateAngle = null;
 
-                if(this.lastTouchEndTimestamp === null || this.lastTouchEndObject === null) {
-                    this.lastTouchEndTimestamp = Math.round(new Date().getTime());
-                    this.lastTouchEndObject = e.changedTouches[0];
-                } else {
-                    var currentTimestamp = Math.round(new Date().getTime());
-                    if(currentTimestamp - this.lastTouchEndTimestamp < 300) {
+                // This event will be conflicted with the system event "dblclick", so disable it when "desktop" enabled
+                if(!this.desktop) {
+                    if(this.lastTouchEndTimestamp === null || this.lastTouchEndObject === null) {
+                        this.lastTouchEndTimestamp = Math.round(new Date().getTime());
+                        this.lastTouchEndObject = e.changedTouches[0];
+                    } else {
+                        var currentTimestamp = Math.round(new Date().getTime());
+                        if(currentTimestamp - this.lastTouchEndTimestamp < 300) {
 
-                        if(Math.abs(this.lastTouchEndObject.pageX - e.changedTouches[0].pageX) < 20 &&
-                            Math.abs(this.lastTouchEndObject.pageY - e.changedTouches[0].pageY < 20)) {
-                            // Zoom!
-                            this.dbclickZoomLength = 100 * this.dbclickZoomThreshold;
+                            if(Math.abs(this.lastTouchEndObject.pageX - e.changedTouches[0].pageX) < 20 &&
+                                Math.abs(this.lastTouchEndObject.pageY - e.changedTouches[0].pageY < 20)) {
+                                // Zoom!
+                                this.dbclickZoomLength = 100 * this.dbclickZoomThreshold;
 
-                            if(this.dbclickZoomToggle){
-                                if(!this._zoomInAnim()) {
-                                    this._zoomOutAnim();
+                                if(this.dbclickZoomToggle){
+                                    if(!this._zoomInAnim()) {
+                                        this._zoomOutAnim();
+                                    }
+                                } else {
+                                    if(!this._zoomOutAnim()) {
+                                        this._zoomInAnim();
+                                    }
                                 }
-                            } else {
-                                if(!this._zoomOutAnim()) {
-                                    this._zoomInAnim();
-                                }
+
+                                this.dbclickZoomToggle = !this.dbclickZoomToggle;
                             }
-
-                            this.dbclickZoomToggle = !this.dbclickZoomToggle;
                         }
-                    }
 
-                    this.lastTouchEndTimestamp = currentTimestamp;
-                    this.lastTouchEndObject = e.changedTouches[0];
+                        this.lastTouchEndTimestamp = currentTimestamp;
+                        this.lastTouchEndObject = e.changedTouches[0];
+                    }
                 }
 
             }.bind(this));
 
             this.canvas.addEventListener('touchstart', function(e) {
 
-                this.isTouching = true;
+                this.isOnTouching = true;
 
                 this.lastX          = null;
                 this.lastY          = null;
@@ -351,6 +382,10 @@ This code may be freely distributed under the MIT License
 
                     this._doZoom(this._gesturePinchZoom(e));
 
+                    if(this.gestureRotate) {
+                        this._doRotate(this._gestureRotate(e));
+                    }
+
                 } else if(e.targetTouches.length == 1) {
 
                     var relativeX = e.targetTouches[0].pageX - this.canvas.getBoundingClientRect().left;
@@ -362,16 +397,16 @@ This code may be freely distributed under the MIT License
 
             this.imgTexture.addEventListener('load', function(e){
                 this.isImgLoaded = true;
-                this.isFirstTime = true;
+                this.isFirstTimeLoad = true;
             }.bind(this));
 
             if(this.desktop) {
 
                 window.addEventListener('keyup', function(e) {
-                    if(e.keyCode == 187 || e.keyCode == 61) { 
+                    if(e.keyCode == 187) { 
                         this._doZoom(5);
                     }
-                    else if(e.keyCode == 54) {
+                    else if(e.keyCode == 189) {
                         this._doZoom(-5);
                     }
                 }.bind(this));
@@ -397,6 +432,24 @@ This code may be freely distributed under the MIT License
                     if(relativeX <= 0 || relativeX >= this.canvas.clientWidth || relativeY <= 0 || relativeY >= this.canvas.clientHeight) {
                         this.mdown = false;
                     }
+                }.bind(this));
+
+                window.addEventListener('dblclick', function(e) {
+                    console.log(e);
+                    // Zoom!
+                    this.dbclickZoomLength = 100 * this.dbclickZoomThreshold;
+
+                    if(this.dbclickZoomToggle){
+                        if(!this._zoomInAnim()) {
+                            this._zoomOutAnim();
+                        }
+                    } else {
+                        if(!this._zoomOutAnim()) {
+                            this._zoomInAnim();
+                        }
+                    }
+
+                    this.dbclickZoomToggle = !this.dbclickZoomToggle;
                 }.bind(this));
             }
         },

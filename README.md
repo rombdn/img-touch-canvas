@@ -71,26 +71,29 @@ A full example shows below, you can use the public api `doZoom` to zoom the imag
                 var zoomage = new Zoomage({
 
                     // Basic Settings:
-                    // [canvas: DOM] A canvas dom element for displaying
+                    // [canvas: DOM] A canvas dom element for displaying.
                     canvas: document.getElementById('canvas'),
 
-                    // [path: String] An image's path which you want to be zoomed
+                    // [path: String] An image's path which you want to be zoomed.
                     path: "./images/scenery_image.jpg",
 
                     // Advanced Settings:
-                    // [dbclickZoomThreshold: Number] Set auto zoom threshold when double click on the image (value 0.1 means the zoom step length is 10% of image's current scale)
+                    // [desktop: Boolean] Support the desktop manipulation, you can control the image with mouse and keyboard, "+ / -" will zoom in / out the image, double click on the image will auto-zoom, also you can move the image with your mouse click down and drug.
+                    desktop: true, 
+
+                    // [dbclickZoomThreshold: Number] Set auto zoom threshold when double click on the image (value 0.1 means the zoom step length is 10% of image's current scale).
                     dbclickZoomThreshold: 0.1，
 
-                    // [onZoom: Function] Callback function called when image is zooming
+                    // [onZoom: Function] Callback function called when image is zooming.
                     onZoom: function(data) { 
                         console.log("[Zoom Scale] " + data.zoomScale, "\n[Image Width] " + data.imageScale.width, "\n[Image Height] " + data.imageScale.height);
                     }
                 });
 
-                // Increase the image size for 10 percent
+                // Increase the image size for 10 percent.
                 zoomage.zoom(0.1);
 
-                // Reduce the image size for 10 percent
+                // Reduce the image size for 10 percent.
                 zoomage.zoom(-0.1);
 
             </script>
