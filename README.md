@@ -10,6 +10,8 @@ Based on a canvas element for smooth rendering (CSS3 Transform / Canvas).
 
 Plain HTML5 / Vanilla JS, no external libraries needed.
 
+Example: please open "index.html" in your local browser.
+
 This library is based on "[rombdn/img-touch-canvas](https://github.com/rombdn/img-touch-canvas)", include updates and bug fix.
 
 
