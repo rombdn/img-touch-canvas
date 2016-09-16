@@ -55,11 +55,6 @@ A full example shows below, you can use the public api `doZoom` to zoom the imag
                     z-index: 10;
                 }
 
-                #container canvas {
-                    width: 100%;
-                    height: 100%;
-                } 
-
             </style>
         </head>
         <body>
@@ -67,7 +62,7 @@ A full example shows below, you can use the public api `doZoom` to zoom the imag
                 <canvas id="canvas"></canvas>
             </div>
 
-            <script src="Zoomage.js"></script>
+            <script src="Zoomage.min.js"></script>
             <script>
 
                 // Initialize "Zoomage" with a canvas and an image
@@ -96,10 +91,15 @@ A full example shows below, you can use the public api `doZoom` to zoom the imag
 
 
                     // Callback Settings:
+                    // [onDrag: Function] Callback function called when image is on draging.
+                    onDrag: function(data) {
+                        console.log("[Drag Position X] " + data.x, "[Drag Position Y] " + data.y);
+                    },
+
                     // [onZoom: Function] Callback function called when image is on zooming.
                     onZoom: function(data) { 
                         console.log("[Zoom Scale] " + data.zoom, "\n[Image Width] " + data.scale.width, "\n[Image Height] " + data.scale.height);
-                    }
+                    },
 
                     // [onRotate: Function] Callback function called when image is on rotating.
                     onRotate: function(data) {

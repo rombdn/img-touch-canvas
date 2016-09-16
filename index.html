@@ -34,11 +34,14 @@
                 enableGestureRotate: true,
                 enableDesktop: true,
                 dbclickZoomThreshold: 0.2,
+                onDrag: function(data) {
+                    console.log("[Drag Position X] " + data.x, "[Drag Position Y] " + data.y);
+                },
                 onZoom: function(data) {
                     console.log("[Zoom Scale] " + data.zoom, "\n[Image Width] " + data.scale.width, "\n[Image Height] " + data.scale.height);
                 },
                 onRotate: function(data) {
-                    console.log("[onRotate] " + data.rotate);
+                    console.log("[Rotate Degree] " + data.rotate);
                 }
             });
 

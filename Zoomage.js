@@ -28,7 +28,6 @@ This code may be freely distributed under the MIT License
 
 }(this, function() {
 
-
     var Zoomage = function(options) {
         if (!options || !options.container) {
             throw '[Zoomage.js Error] Zoomage constructor: missing arguments [container].';
@@ -47,6 +46,7 @@ This code may be freely distributed under the MIT License
         // Get callback method
         this.onZoom                = options.onZoom || null;
         this.onRotate              = options.onRotate || null;
+        this.onDrag                = options.onDrag || null;
 
         // Save current context
         this.context.save();
@@ -58,9 +58,9 @@ This code may be freely distributed under the MIT License
         this.minZoom               = Math.abs(options.minZoom) || 0.2;
 
         // Whether turn on the switcher of gesture rotate
-        this.enableGestureRotate  = options.enableGestureRotate || false;
+        this.enableGestureRotate   = options.enableGestureRotate || false;
         // Whether support this feature on desktop version
-        this.enableDesktop        = options.enableDesktop || false;
+        this.enableDesktop         = options.enableDesktop || false;
 
         // Default settings
         this.imgTexture            = new Image();
@@ -74,6 +74,8 @@ This code may be freely distributed under the MIT License
 
         this.lastX                 = null;
         this.lastY                 = null;
+
+        this.zoomD                 = 1;
 
         this.mdown                 = false; 
 
@@ -173,8 +175,9 @@ This code may be freely distributed under the MIT License
             var zoom = false;
 
             if (touches.length >= 2) {
-                var p1 = touches[0];
-                var p2 = touches[1];
+                var p1 = touches[0],
+                    p2 = touches[1];
+
                 var zoomScale = Math.sqrt(Math.pow(p2.pageX - p1.pageX, 2) + Math.pow(p2.pageY - p1.pageY, 2)); 
 
                 if (this.lastZoomScale) {
@@ -191,16 +194,15 @@ This code may be freely distributed under the MIT License
             var rotate = false;
 
             if (touches.length >= 2) {
-                var p1 = touches[0];
-                var p2 = touches[1];
+                var p1 = touches[0],
+                    p2 = touches[1];
 
-                var x = p2.pageX - p1.pageX;
-                var y = p2.pageY - p1.pageY;
+                var x = p2.pageX - p1.pageX,
+                    y = p2.pageY - p1.pageY;
+
+                // TO FIX (If you continuously rotating more than 180 degree, here will cause a bug)
                 var rotateAngel = (Math.atan2(y, x) * 180 / Math.PI) < 0 ? 180 + (Math.atan2(y, x) * 180 / Math.PI)  : (Math.atan2(y, x) * 180 / Math.PI);
             }  
-
-
-            console.log(rotateAngel);
 
             rotate = {
                 o: p1,
@@ -215,14 +217,15 @@ This code may be freely distributed under the MIT License
 
             // Get new scale
             var currentScale   = this.scale.x;
-            var newScale       = this.scale.x + zoom;
-
+                newScale       = this.scale.x + zoom;
+            
             // Get increasing width and height
-            var deltaScale     = newScale - currentScale;
-            var deltaWidth     = this.imgTexture.width * deltaScale;
-            var deltaHeight    = this.imgTexture.height * deltaScale;
-            var newPosX        = this.position.x - deltaWidth / 2;
-            var newPosY        = this.position.y - deltaHeight / 2;
+            var deltaScale     = newScale - currentScale,
+                deltaWidth     = this.imgTexture.width * deltaScale,
+                deltaHeight    = this.imgTexture.height * deltaScale;
+
+            var newPosX        = this.position.x - deltaWidth / 2,
+                newPosY        = this.position.y - deltaHeight / 2;
 
             // Zoom restriction
             if (newScale > this.maxZoom || newScale < this.minZoom) {
@@ -235,18 +238,11 @@ This code may be freely distributed under the MIT License
             this.position.x    = newPosX;
             this.position.y    = newPosY;
 
-            this.isOnTouching = true;
+            this.isOnTouching  = true;
 
-            if (this._type(this.onZoom) === "function") {
-                this.onZoom.call(this, 
-                    {
-                        zoom: newScale, 
-                        scale: {
-                            width: newScale * this.imgTexture.width ,
-                            height: newScale * this.imgTexture.height
-                        }
-                    });
-            }
+            this.zoomD         = newScale;
+
+            this._runCallback("onZoom");
 
             return true;
         },
@@ -254,14 +250,14 @@ This code may be freely distributed under the MIT License
         _doMove: function(relativeX, relativeY) {
             if (this.lastX && this.lastY) {
 
-              var deltaX = relativeX - this.lastX;
-              var deltaY = relativeY - this.lastY;
-              var currentWidth = (this.imgTexture.width * this.scale.x);
-              var currentHeight = (this.imgTexture.height * this.scale.y);
+                var deltaX = relativeX - this.lastX,
+                    deltaY = relativeY - this.lastY;
 
-              this.position.x += deltaX;
-              this.position.y += deltaY;
+                var currentWidth = (this.imgTexture.width * this.scale.x),
+                    currentHeight = (this.imgTexture.height * this.scale.y);
 
+                this.position.x += deltaX;
+                this.position.y += deltaY;
             }
 
             this.lastX = relativeX;
@@ -277,12 +273,7 @@ This code may be freely distributed under the MIT License
 
             this.lastTouchRotateAngle = rotateArr.a;
 
-            if (this._type(this.onRotate) === "function") {
-                this.onRotate.call(this, 
-                    {
-                        rotate: this.rotate.angle
-                    });
-            }
+            this._runCallback("onRotate");
         },  
 
         _zoomInAnim_Canvas: function() {
@@ -377,6 +368,39 @@ This code may be freely distributed under the MIT License
             }
         },
 
+        _runCallback: function(flag, arg) {
+            switch(flag) {
+                case "onDrag":
+                if (this._type(this.onDrag) === "function") {
+                    this.onDrag.call(this, { 
+                        x: this.lastX.toFixed(3),
+                        y: this.lastY.toFixed(3)
+                    });
+                }
+                break;
+
+                case "onRotate":
+                if (this._type(this.onRotate) === "function") {
+                    this.onRotate.call(this, { 
+                        rotate: this.rotate.angle.toFixed(3)
+                    });
+                }
+                break;
+
+                case "onZoom":
+                if (this._type(this.onZoom) === "function") {
+                    this.onZoom.call(this, {
+                        zoom: this.zoomD.toFixed(3), 
+                        scale: {
+                            width: (this.zoomD * this.imgTexture.width).toFixed(3) ,
+                            height: (this.zoomD * this.imgTexture.height).toFixed(3)
+                        }
+                    });
+                }
+                break;
+            }
+        },
+
         _setEventListeners_Transform: function() {
 
             this.container.addEventListener('touchend', function(e) {
@@ -427,16 +451,7 @@ This code may be freely distributed under the MIT License
                     this.zoomD = this.zoomD + this._gesturePinchZoom(e.touches) / 100;
 
                     // Callback [onZoom]
-                    if (this._type(this.onZoom) === "function") {
-                        this.onZoom.call(this, 
-                            {
-                                zoom: this.zoomD, 
-                                scale: {
-                                    width: this.zoomD * this.imgTexture.width ,
-                                    height: this.zoomD * this.imgTexture.height
-                                }
-                            });
-                    }
+                    this._runCallback("onZoom");
 
                     // Rotate
                     this._doRotate(this._enableGestureRotate(e.touches));
@@ -452,6 +467,7 @@ This code may be freely distributed under the MIT License
                     this.lastX = e.touches[0].pageX;
                     this.lastY = e.touches[0].pageY;
 
+                    this._runCallback("onDrag");
                 }
 
             }.bind(this));
@@ -513,6 +529,11 @@ This code may be freely distributed under the MIT License
                     else if (e.keyCode == 189) {
                         this.zoomD -= 0.1;
                     }
+
+                    if(e.keyCode == 187 || e.keyCode == 189) {
+                        this._runCallback("onZoom");
+                    }
+
                 }.bind(this));
 
                 window.addEventListener('mousedown', function(e) {
@@ -535,6 +556,8 @@ This code may be freely distributed under the MIT License
 
                         this.lastX = e.pageX;
                         this.lastY = e.pageY;
+
+                        this._runCallback("onDrag");
                     }
 
                 }.bind(this));
@@ -609,9 +632,12 @@ This code may be freely distributed under the MIT License
 
                 } else if (e.targetTouches.length == 1) {
 
-                    var relativeX = e.targetTouches[0].pageX - this.canvas.getBoundingClientRect().left;
-                    var relativeY = e.targetTouches[0].pageY - this.canvas.getBoundingClientRect().top;                
+                    var relativeX = e.targetTouches[0].pageX - this.canvas.getBoundingClientRect().left,
+                        relativeY = e.targetTouches[0].pageY - this.canvas.getBoundingClientRect().top; 
+
                     this._doMove(relativeX, relativeY);
+
+                    this._runCallback("onDrag");
                     
                 }
             }.bind(this));
@@ -678,8 +704,8 @@ This code may be freely distributed under the MIT License
                 }.bind(this));
 
                 window.addEventListener('mousemove', function(e) {
-                    var relativeX = e.pageX - this.canvas.getBoundingClientRect().left;
-                    var relativeY = e.pageY - this.canvas.getBoundingClientRect().top;
+                    var relativeX = e.pageX - this.canvas.getBoundingClientRect().left,
+                        relativeY = e.pageY - this.canvas.getBoundingClientRect().top;
 
                     if (e.target == this.canvas && this.mdown) {
                         this._doMove(relativeX, relativeY);
@@ -688,6 +714,8 @@ This code may be freely distributed under the MIT License
                     if (relativeX <= 0 || relativeX >= this.canvas.clientWidth || relativeY <= 0 || relativeY >= this.canvas.clientHeight) {
                         this.mdown = false;
                     }
+
+                    this._runCallback("onDrag");
                 }.bind(this));
 
                 window.addEventListener('dblclick', function(e) {
