@@ -1,4 +1,4 @@
-<p align="center"><img width="100"src="https://github.com/Becavalier/Zoomage.js/blob/master/images/logo.png?raw=true"></p>
+<p align="center"><img width="400"src="https://github.com/Becavalier/Zoomage.js/blob/master/images/logo.png?raw=true"></p>
 
 
 Instruction
