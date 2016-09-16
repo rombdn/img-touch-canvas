@@ -1,6 +1,15 @@
 Zoomage.js
 ================
 
+Instruction
+------------
+
+Add touch gestures (pinch zoom, touch drag and twist rotate) to an image (like Google Maps).
+
+Based on a canvas element for smooth rendering (CSS3 Transform / Canvas).
+
+Plain HTML5 / Vanilla JS, no external libraries needed.
+
 This library is based on "[rombdn/img-touch-canvas](https://github.com/rombdn/img-touch-canvas)", include updates and bug fix.
 
 
@@ -18,15 +27,6 @@ Preview
 
 ##### Rotate the image with two fingers touch.
 ![image](https://github.com/Becavalier/Zoomage.js/blob/master/images/preview-rotate.gif?raw=true)
-
-Instruction
-------------
-
-Add touch gestures (pinch zoom and touch drag) to an image (like Google Maps).
-
-Based on a canvas element for smooth rendering.
-
-Plain HTML5 / Vanilla JS, no external libraries needed.
 
 
 Usage
