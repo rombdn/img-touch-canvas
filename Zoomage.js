@@ -3,7 +3,7 @@
 img-touch-canvas - v0.1
 http://github.com/rombdn/img-touch-canvas
 
-Zoomage.js - v0.1 (Latest)
+Zoomage.js - v1.0.0 (Latest)
 https://github.com/Becavalier/Zoomage.js
 
 (c) 2013 Romain BEAUDON
