@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,minimal-ui" />
+        <style>
+
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+
+            #container {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);  
+                z-index: 10;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="container"></div>
+
+        <script src="./Zoomage.min.js"></script>
+        <script>
+
+            // Initialize the Zoomage.js
+            var zoomage = new Zoomage({
+                container: document.getElementById('container'),
+                maxZoom: 3,
+                minZoom: 0.1,
+                enableGestureRotate: true,
+                enableDesktop: true,
+                dbclickZoomThreshold: 0.2,
+                onDrag: function(data) {
+                    console.log("[Drag Position X] " + data.x, "[Drag Position Y] " + data.y);
+                },
+                onZoom: function(data) {
+                    console.log("[Zoom Scale] " + data.zoom, "\n[Image Width] " + data.scale.width, "\n[Image Height] " + data.scale.height);
+                },
+                onRotate: function(data) {
+                    console.log("[Rotate Degree] " + data.rotate);
+                }
+            });
+
+            // Load and display the image
+            zoomage.load("./images/scenery_image.jpg");
+
+        </script>
+    </body>
+</html>

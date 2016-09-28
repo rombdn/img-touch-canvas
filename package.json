@@ -1,0 +1,24 @@
+{
+  "name": "zoomage.js",
+  "version": "1.0.0",
+  "description": "Zoomage.js",
+  "main": "Zoomage.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Becavalier/Zoomage.js.git"
+  },
+  "author": "YHSPY",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Becavalier/Zoomage.js/issues"
+  },
+  "homepage": "https://github.com/Becavalier/Zoomage.js#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglifyjs": "^0.6.2"
+  }
+}
