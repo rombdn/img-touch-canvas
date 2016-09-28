@@ -14,16 +14,17 @@ This code may be freely distributed under the MIT License
 =================================
 */
 
-(function(root, factory) {
+(function(root, factory, document) {
 
+    // For CMD like environment
     if (typeof module === "object" && module.exports) {
-
-        module.exports = factory();
-
+        if(typeof document == "undefined") {
+            throw '[Zoomage.js Error] You must use Zoomage.js in a browser environment, missing key object [document].';
+        } else {
+            module.exports = factory();
+        }
     } else {
-
         root.Zoomage = factory();
-        
     }
 
 }(this, function() {
@@ -34,8 +35,8 @@ This code may be freely distributed under the MIT License
         }
 
         // Set container and canvas
-        this.container            = options.container; 
-        this.canvas               = document.createElement("canvas");
+        this.container             = options.container; 
+        this.canvas                = document.createElement("canvas");
 
         // Append the canvas
         this.container.appendChild(this.canvas);
@@ -833,4 +834,4 @@ This code may be freely distributed under the MIT License
 
     return Zoomage;
 
-}));
+}, window.document));
