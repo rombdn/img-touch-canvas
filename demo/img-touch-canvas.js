@@ -64,6 +64,11 @@ This code may be freely distributed under the MIT License
 
                     this.scale.x = scaleRatio;
                     this.scale.y = scaleRatio;
+                    
+                    // Center the image
+                    let w = ((this.imgTexture.width * this.scale.x) - this.canvas.clientWidth) / 2;
+                    this.position.x = -w;
+                    
                     this.init = true;
                 }
             }
